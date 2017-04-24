@@ -10,7 +10,7 @@ namespace Chess {
 		public RenderWindow Window { get; }
 		public Sprite Background { get; }
 		public static Image PieceSpritesheet { get; } = new Image("Resources/Pieces.png");
-		public Piece[] Pieces { get; }
+		public List<Piece> Pieces { get; }
 
 		public Game() {
 			Window = new RenderWindow(new VideoMode(360, 360), "Chess.NET");
@@ -66,7 +66,6 @@ namespace Chess {
 		}
 		
 		private int selectedPiece = -1;
-		private Vector2f oldPiecePosition;
 
 		private Vertex[] GetPieceHighlight() {
 			Vertex[] arr = new Vertex[8];
@@ -92,29 +91,44 @@ namespace Chess {
 		private void OnMouseButtonRelease(object sender, MouseButtonEventArgs e) {
 			if (selectedPiece != -1) {
 				Vector2f newPosition = (new Vector2f(e.X, e.Y) / Piece.Size).Floor();
-				if (Pieces[selectedPiece].CanMove(newPosition)) {
-					Pieces[selectedPiece].BoardPosition = newPosition;
-				} else {
-					Pieces[selectedPiece].BoardPosition = oldPiecePosition;
+				Piece selected = Pieces[selectedPiece];
+				if (selected.CanMove(Pieces.Except(new[] { selected }).ToList(), newPosition) && CanMoveSelected()) {
+					selected.BoardPosition = newPosition;
 				}
+				selected.UseBoardPosition();
 			}
 			selectedPiece = -1;
 		}
 
 		private void OnMouseButtonPress(object sender, MouseButtonEventArgs e) {
 			Vector2f boardPosition = (new Vector2f(e.X, e.Y) / Piece.Size).Floor();
-			for (int i = 0; i < Pieces.Length; i++) {
+			for (int i = 0; i < Pieces.Count; i++) {
 				if (Pieces[i].BoardPosition == boardPosition) {
 					selectedPiece = i;
-					oldPiecePosition = Pieces[i].BoardPosition;
 					return;
 				}
 			}
 		}
 
-		//private bool CheckOccupied() {
-		//	if ()
-		//}
+		/**
+		 * <summary>Removes opposing piece from target position and returns true, or returns false if the piece is friendly.</summary>
+		 * <remarks>Also returns true if there is no piece at the target position.</remarks>
+		 */
+		public bool CanMoveSelected() {
+			Piece selected = Pieces[selectedPiece];
+			Piece other = Pieces.Where(p => {
+				return selected.GetWorkingBoardPosition() == p.BoardPosition && p != Pieces[selectedPiece];
+			}).SingleOrDefault();
+			if (other == default(Piece)) {
+				return true;
+			}
+			if (other.Team == selected.Team) {
+				return false;
+			} else { // TODO: Handle check(mate)
+				Pieces.Remove(other);
+				return true;
+			}
+		}
 
 		private void OnClose(object sender, EventArgs e) {
 			Window.Close();

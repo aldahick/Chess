@@ -9,8 +9,8 @@ namespace Chess.Pieces {
 
 		public override int TextureIndex => 1;
 
-		public override bool CanMove(Vector2f to) {
-			return Bishop.CanMove(BoardPosition, to) || Rook.CanMove(BoardPosition, to);
+		public override bool CanMove(List<Piece> board, Vector2f to) {
+			return Bishop.CanMove(this, board, to) || Rook.CanMove(this, board, to);
 		}
 	}
 }

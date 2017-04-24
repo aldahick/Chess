@@ -10,67 +10,70 @@ namespace Chess {
 		public const int Size = 45;
 		public Sprite Sprite { get; }
 		public Team Team { get; }
+		public Vector2f BoardPosition { get; set; }
+		public bool IsCaptured { get; set; }
 
-		public abstract bool CanMove(Vector2f to);
+		/**
+		 * <summary>Returns true if the piece can move to the specified position.</summary>
+		 * <remarks>
+		 * Should not modify the board at all.
+		 * Returns true if there is an opposing piece in the target position.
+		 * </remarks>
+		 */
+		public abstract bool CanMove(List<Piece> board, Vector2f to);
 		public abstract int TextureIndex { get; }
 
 		public Piece(Vector2f boardPosition, Team team) {
 			Team = team;
 			Sprite = SetupSprite();
-			Sprite.Position = boardPosition * Size;
+			BoardPosition = boardPosition;
+			UseBoardPosition();
 		}
 
 		public Vector2f Position {
 			get => Sprite.Position;
+			set => Sprite.Position = value;
 		}
 
-		public Vector2f BoardPosition {
-			get => Sprite.Position / Size;
-			set {
-				if (!CanMove(value)) {
-					return;
-				}
-				Sprite.Position = value * Size;
-			}
+		public void UseBoardPosition() {
+			this.Sprite.Position = BoardPosition * Size;
+		}
+
+		public Vector2f GetWorkingBoardPosition() {
+			return this.Sprite.Position / Size;
 		}
 
 		private Sprite SetupSprite() {
-			Vector2i texturePosition = new Vector2i(TextureIndex * Size, Size *(int)Team);
+			Vector2i texturePosition = new Vector2i(TextureIndex * Size, Size * (int)Team);
 			Texture texture = new Texture(Game.PieceSpritesheet, new IntRect(texturePosition, new Vector2i(Size, Size)));
 			return new Sprite(texture);
 		}
 
-		public static Piece[] CreateStandardBoard() {
-			Piece[] board = new Piece[32];
-			Piece[] white = CreateStandardTeam(Team.White);
-			Piece[] black = CreateStandardTeam(Team.Black);
-			for (int i = 0; i < white.Length; i++) {
-				board[i] = white[i];
-			}
-			for (int i = 0; i < black.Length; i++) {
-				board[i + white.Length] = black[i];
-			}
+		public static List<Piece> CreateStandardBoard() {
+			List<Piece> board = new List<Piece>();
+			board.AddRange(CreateStandardTeam(Team.White));
+			board.AddRange(CreateStandardTeam(Team.Black));
 			foreach (Piece piece in board) {
 				piece.SetupSprite();
 			}
 			return board;
 		}
 
-		private static Piece[] CreateStandardTeam(Team team) {
+		private static List<Piece> CreateStandardTeam(Team team) {
 			int teamRow = team == Team.White ? 0 : 7;
 			int pawnRow = team == Team.White ? 1 : 6;
-			Piece[] board = new Piece[16];
+			List<Piece> board = new List<Piece>();
 			for (int i = 0; i < 8; i++) {
-				board[i] = new Pawn(new Vector2f(i, pawnRow), team);
+				board.Add(new Pawn(new Vector2f(i, pawnRow), team));
 			}
-			board[8] = new King(new Vector2f(team == Team.White ? 3 : 4, teamRow), team);
-			board[9] = new Queen(new Vector2f(team == Team.White ? 4 : 3, teamRow), team);
-			board[10] = new Bishop(new Vector2f(2, teamRow), team);
-			board[11] = new Bishop(new Vector2f(5, teamRow), team);
-			board[12] = new Knight(new Vector2f(1, teamRow), team);
-			board[13] = new Knight(new Vector2f(6, teamRow), team);
-			board[14] = new Rook(new Vector2f(0, teamRow), team);
-			board[15] = new Rook(new Vector2f(7, teamRow), team);
+			board.Add(new King(new Vector2f(team == Team.White ? 3 : 4, teamRow), team));
+			board.Add(new Queen(new Vector2f(team == Team.White ? 4 : 3, teamRow), team));
+			board.Add(new Bishop(new Vector2f(2, teamRow), team));
+			board.Add(new Bishop(new Vector2f(5, teamRow), team));
+			board.Add(new Knight(new Vector2f(1, teamRow), team));
+			board.Add(new Knight(new Vector2f(6, teamRow), team));
+			board.Add(new Rook(new Vector2f(0, teamRow), team));
+			board.Add(new Rook(new Vector2f(7, teamRow), team));
 			return board;
 		}
 	}

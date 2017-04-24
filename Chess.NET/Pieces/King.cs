@@ -9,7 +9,7 @@ namespace Chess.Pieces {
 
 		public override int TextureIndex => 0;
 
-		public override bool CanMove(Vector2f to) {
+		public override bool CanMove(List<Piece> board, Vector2f to) {
 			Vector2f diff = (BoardPosition - to).Abs();
 			return !(diff.X > 1 || diff.Y > 1);
 		}
