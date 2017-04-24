@@ -66,6 +66,7 @@ namespace Chess {
 		}
 		
 		private int selectedPiece = -1;
+		private Vector2f oldPiecePosition;
 
 		private Vertex[] GetPieceHighlight() {
 			Vertex[] arr = new Vertex[8];
@@ -85,14 +86,17 @@ namespace Chess {
 			if (selectedPiece == -1) {
 				return;
 			}
-			Pieces[selectedPiece].Sprite.Position = new Vector2f(e.X, e.Y);
+			Pieces[selectedPiece].Sprite.Position = new Vector2f(e.X - Piece.Size / 2, e.Y - Piece.Size / 2);
 		}
 
 		private void OnMouseButtonRelease(object sender, MouseButtonEventArgs e) {
 			if (selectedPiece != -1) {
-				Vector2f oldPosition = Pieces[selectedPiece].BoardPosition;
-				Pieces[selectedPiece].BoardPosition = (new Vector2f(e.X, e.Y) / Piece.Size).Floor();
-				int x = 5;
+				Vector2f newPosition = (new Vector2f(e.X, e.Y) / Piece.Size).Floor();
+				if (Pieces[selectedPiece].CanMove(newPosition)) {
+					Pieces[selectedPiece].BoardPosition = newPosition;
+				} else {
+					Pieces[selectedPiece].BoardPosition = oldPiecePosition;
+				}
 			}
 			selectedPiece = -1;
 		}
@@ -102,10 +106,15 @@ namespace Chess {
 			for (int i = 0; i < Pieces.Length; i++) {
 				if (Pieces[i].BoardPosition == boardPosition) {
 					selectedPiece = i;
+					oldPiecePosition = Pieces[i].BoardPosition;
 					return;
 				}
 			}
 		}
+
+		//private bool CheckOccupied() {
+		//	if ()
+		//}
 
 		private void OnClose(object sender, EventArgs e) {
 			Window.Close();

@@ -14,7 +14,12 @@ namespace Chess.Pieces {
 		public override bool CanMove(Vector2f to) {
 			Vector2f diff = BoardPosition - to;
 			int mod = Team == Team.White ? 1 : -1;
-			return (diff.X <= 1 && diff.X >= -1) && diff.Y == mod;
+			int homeRow = Team == Team.White ? 1 : 6;
+			return (
+				(diff.X <= 1 && diff.X >= -1) && diff.Y <= mod
+			) || (
+				BoardPosition.X == homeRow && diff.X == 0 && diff.Y == 2
+			);
 		}
 	}
 }
