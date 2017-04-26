@@ -82,7 +82,8 @@ namespace Chess {
 			Piece selected = Pieces[selectedPiece];
 			Vector2f workingPosition = selected.GetWorkingBoardPosition();
 			Vector2f selectedPosition = workingPosition * Piece.Size;
-			Color color = selected.CanMove(Pieces, workingPosition) ? Color.Green : Color.Red;
+			bool canMove = selected.CanMove(Pieces.Except(new[] { selected }).ToList(), workingPosition);
+			Color color = canMove ? Color.Green : Color.Red;
 			arr[0] = new Vertex(selectedPosition, color);
 			arr[1] = new Vertex(selectedPosition + new Vector2f(0, Piece.Size), color);
 			arr[2] = new Vertex(selectedPosition + new Vector2f(Piece.Size, Piece.Size), color);
