@@ -15,11 +15,16 @@ namespace Chess.Pieces {
 			Vector2f diff = BoardPosition - to;
 			int mod = Team == Team.White ? -1 : 1;
 			int homeRow = Team == Team.White ? 1 : 6;
-			return (
-				(diff.X <= 1 && diff.X >= -1) && diff.Y == mod
+			int count = board.Count(p => {
+				return p.BoardPosition == to && p.Team != this.Team && p != this;
+			});
+			return ((
+				count == 0 && diff.X == 0 && diff.Y == mod
 			) || (
-				BoardPosition.Y == homeRow && diff.X == 0 && diff.Y == (mod * 2)
-			);
+				count == 1 && Math.Abs(diff.X) == 1 && diff.Y == mod
+			) || (
+				count == 0 && BoardPosition.Y == homeRow && diff.X == 0 && diff.Y == (mod * 2)
+			));
 		}
 	}
 }
