@@ -7,7 +7,7 @@ namespace Chess.Shared {
 	public class Board {
 		public List<Piece> Pieces { get; }
 		public Team CurrentTurn { get; set; } = Team.White;
-		protected int selectedPiece = -1;
+		public int SelectedPiece { get; set; } = -1;
 
 		public Board() {
 			Pieces = Piece.CreateStandardBoard();
@@ -18,15 +18,16 @@ namespace Chess.Shared {
 		 * <remarks>Also returns true if there is no piece at the target position.</remarks>
 		 */
 		public bool CanMoveSelected() {
-			return CanMoveSelected(Pieces[selectedPiece].BoardPosition);
+			Vector2f workingPosition = Pieces[SelectedPiece].BoardPosition;
+			Piece selected = Pieces[SelectedPiece];
+			Piece other = Pieces.Where(p => {
+				return workingPosition == p.BoardPosition && p != Pieces[SelectedPiece];
+			}).SingleOrDefault();
+			return CanMoveSelected(selected, other, workingPosition);
 		}
 
-		public bool CanMoveSelected(Vector2f workingPosition) {
-			Piece selected = Pieces[selectedPiece];
-			Piece other = Pieces.Where(p => {
-				return workingPosition == p.BoardPosition && p != Pieces[selectedPiece];
-			}).SingleOrDefault();
-			if (other == default(Piece)) {
+		public bool CanMoveSelected(Piece selected, Piece other, Vector2f workingPosition) {
+			if (other == null) {
 				return true;
 			}
 			if (other.Team == selected.Team) {

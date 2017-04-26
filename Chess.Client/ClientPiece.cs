@@ -14,6 +14,7 @@ namespace Chess.Client {
 		public ClientPiece(Piece child) {
 			Child = child;
 			Sprite = SetupSprite();
+			UseBoardPosition();
 		}
 
 		public void UseBoardPosition() {

@@ -17,7 +17,20 @@ namespace Chess.Client {
 		}
 
 		public new bool CanMoveSelected() {
-			return CanMoveSelected(Pieces[selectedPiece].GetWorkingBoardPosition());
+			Vector2f workingPosition = Pieces[SelectedPiece].GetWorkingBoardPosition();
+			Piece selected = Pieces[SelectedPiece].Child;
+			ClientPiece other = Pieces.Where(p => {
+				return workingPosition == p.Child.BoardPosition && p != Pieces[SelectedPiece];
+			}).SingleOrDefault();
+			if (other == null) {
+				return true;
+			}
+			if (other.Child.Team == selected.Team) {
+				return false;
+			} else { // TODO: Handle check(mate)
+				Pieces.Remove(other);
+				return true;
+			}
 		}
 
 		public List<Piece> AllExcept(ClientPiece piece) {

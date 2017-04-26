@@ -33,14 +33,14 @@ namespace Chess.Client {
 			Window.Clear(Color.Black);
 			Window.Draw(Background);
 			for (int i = 0; i < Board.Pieces.Count; i++) {
-				if (i != selectedPiece) {
+				if (i != Board.SelectedPiece) {
 					Window.Draw(Board.Pieces[i].Sprite);
 				}
 			}
-			if (selectedPiece != -1) {
-				Window.Draw(Board.Pieces[selectedPiece].Sprite);
+			if (Board.SelectedPiece != -1) {
+				Window.Draw(Board.Pieces[Board.SelectedPiece].Sprite);
 			}
-			if (selectedPiece != -1) {
+			if (Board.SelectedPiece != -1) {
 				Window.Draw(GetPieceHighlight(), PrimitiveType.Lines);
 			}
 			Window.Draw(new Text($"It is currently {CurrentTurn.ToString()}'s turn.", InfoFont, 16) {
@@ -75,12 +75,10 @@ namespace Chess.Client {
 			Window.MouseButtonReleased += this.OnMouseButtonRelease;
 			Window.MouseMoved += this.OnMouseMove;
 		}
-		
-		private int selectedPiece = -1;
 
 		private Vertex[] GetPieceHighlight() {
 			Vertex[] arr = new Vertex[8];
-			ClientPiece selected = Board.Pieces[selectedPiece];
+			ClientPiece selected = Board.Pieces[Board.SelectedPiece];
 			Vector2f workingPosition = selected.GetWorkingBoardPosition();
 			Vector2f selectedPosition = workingPosition * Piece.Size;
 			bool canMove = selected.Child.CanMove(Board.AllExcept(selected), workingPosition);
@@ -97,23 +95,23 @@ namespace Chess.Client {
 		}
 
 		private void OnMouseMove(object sender, MouseMoveEventArgs e) {
-			if (selectedPiece == -1) {
+			if (Board.SelectedPiece == -1) {
 				return;
 			}
-			Board.Pieces[selectedPiece].Sprite.Position = new Vector2f(e.X - Piece.Size / 2, e.Y - Piece.Size / 2);
+			Board.Pieces[Board.SelectedPiece].Sprite.Position = new Vector2f(e.X - Piece.Size / 2, e.Y - Piece.Size / 2);
 		}
 
 		private void OnMouseButtonRelease(object sender, MouseButtonEventArgs e) {
-			if (selectedPiece != -1) {
+			if (Board.SelectedPiece != -1) {
 				Vector2f newPosition = (new Vector2f(e.X, e.Y) / Piece.Size).Floor();
-				ClientPiece selected = Board.Pieces[selectedPiece];
+				ClientPiece selected = Board.Pieces[Board.SelectedPiece];
 				if (selected.Child.CanMove(Board.AllExcept(selected), newPosition) && Board.CanMoveSelected()) {
 					selected.Child.BoardPosition = newPosition;
 					CurrentTurn = CurrentTurn == Team.White ? Team.Black : Team.White;
 				}
 				selected.UseBoardPosition();
 			}
-			selectedPiece = -1;
+			Board.SelectedPiece = -1;
 		}
 
 		private void OnMouseButtonPress(object sender, MouseButtonEventArgs e) {
@@ -121,7 +119,7 @@ namespace Chess.Client {
 			for (int i = 0; i < Board.Pieces.Count; i++) {
 				if (Board.Pieces[i].Child.BoardPosition == boardPosition) {
 					if (Board.Pieces[i].Child.Team == CurrentTurn) {
-						selectedPiece = i;
+						Board.SelectedPiece = i;
 						return;
 					}
 				}
