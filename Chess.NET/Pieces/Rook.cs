@@ -19,30 +19,24 @@ namespace Chess.Pieces {
 			if ((diff.X != 0 && diff.Y != 0) || (diff.X == 0 && diff.Y == 0)) {
 				return false;
 			}
-			Vector2f pos = new Vector2f(from.X, from.Y);
-			Func<bool> sentry;
-			Action iteration;
-			if (from.X > to.X) {
-				sentry = () => pos.X >= to.X;
-				iteration = () => { pos.X--; };
-			} else if (from.X < to.X) {
-				sentry = () => pos.X <= to.X;
-				iteration = () => { pos.X++; };
-			} else if (from.Y < to.Y) {
-				sentry = () => pos.Y <= to.Y;
-				iteration = () => { pos.Y++; };
-			} else {
-				sentry = () => pos.Y >= to.Y;
-				iteration = () => { pos.Y--; };
-			}
-			for (; sentry(); iteration()) {
+			bool useX = diff.X != 0;
+			float diffComponent = useX ? diff.X : diff.Y;
+			float fromComponent = useX ? from.X : from.Y;
+			float toComponent = useX ? to.X : to.Y;
+			float mod = fromComponent < toComponent ? 1 : -1;
+			for (float c = fromComponent; c <= toComponent; c += mod) {
+				Vector2f pos = new Vector2f() {
+					X = useX ? c : from.X,
+					Y = useX ? from.Y : c
+				};
 				Piece other = board.Where(p => p.BoardPosition == pos).SingleOrDefault();
-				if (other != default(Piece)) {
-					if (other.BoardPosition == to && other.Team != me.Team) {
-						continue; // target position has an opposing piece
-					}
-					return false;
+				if (other == default(Piece)) {
+					continue;
 				}
+				if (other.BoardPosition == to && other.Team != me.Team) {
+					continue;
+				}
+				return false;
 			}
 			return true;
 		}
