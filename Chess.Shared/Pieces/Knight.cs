@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SFML.System;
 
-namespace Chess.Pieces {
+namespace Chess.Shared.Pieces {
 	public class Knight : Piece {
 		public Knight(Vector2f position, Team team) : base(position, team) { }
 

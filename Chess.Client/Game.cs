@@ -4,20 +4,21 @@ using System.Linq;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using Chess.Shared;
 
-namespace Chess {
+namespace Chess.Client {
 	public class Game {
 		public static Font InfoFont { get; } = new Font("Resources/SourceSansPro-Regular.ttf");
 		public static Image PieceSpritesheet { get; } = new Image("Resources/Pieces.png");
 		public RenderWindow Window { get; }
 		public Sprite Background { get; }
-		public List<Piece> Pieces { get; }
-		public Team CurrentTurn { get; set; } = Team.White;
+		public Team CurrentTurn { get; set; }
+		public ClientBoard Board { get; }
 
 		public Game() {
 			Window = new RenderWindow(new VideoMode(360, 376), "Chess.NET");
 			Background = CreateBackground();
-			Pieces = Piece.CreateStandardBoard();
+			Board = new ClientBoard();
 		}
 
 		public void Start() {
@@ -31,13 +32,13 @@ namespace Chess {
 		private void Render() {
 			Window.Clear(Color.Black);
 			Window.Draw(Background);
-			for (int i = 0; i < Pieces.Count; i++) {
+			for (int i = 0; i < Board.Pieces.Count; i++) {
 				if (i != selectedPiece) {
-					Window.Draw(Pieces[i].Sprite);
+					Window.Draw(Board.Pieces[i].Sprite);
 				}
 			}
 			if (selectedPiece != -1) {
-				Window.Draw(Pieces[selectedPiece].Sprite);
+				Window.Draw(Board.Pieces[selectedPiece].Sprite);
 			}
 			if (selectedPiece != -1) {
 				Window.Draw(GetPieceHighlight(), PrimitiveType.Lines);
@@ -79,10 +80,10 @@ namespace Chess {
 
 		private Vertex[] GetPieceHighlight() {
 			Vertex[] arr = new Vertex[8];
-			Piece selected = Pieces[selectedPiece];
+			ClientPiece selected = Board.Pieces[selectedPiece];
 			Vector2f workingPosition = selected.GetWorkingBoardPosition();
 			Vector2f selectedPosition = workingPosition * Piece.Size;
-			bool canMove = selected.CanMove(Pieces.Except(new[] { selected }).ToList(), workingPosition);
+			bool canMove = selected.Child.CanMove(Board.AllExcept(selected), workingPosition);
 			Color color = canMove ? Color.Green : Color.Red;
 			arr[0] = new Vertex(selectedPosition, color);
 			arr[1] = new Vertex(selectedPosition + new Vector2f(0, Piece.Size), color);
@@ -99,15 +100,15 @@ namespace Chess {
 			if (selectedPiece == -1) {
 				return;
 			}
-			Pieces[selectedPiece].Sprite.Position = new Vector2f(e.X - Piece.Size / 2, e.Y - Piece.Size / 2);
+			Board.Pieces[selectedPiece].Sprite.Position = new Vector2f(e.X - Piece.Size / 2, e.Y - Piece.Size / 2);
 		}
 
 		private void OnMouseButtonRelease(object sender, MouseButtonEventArgs e) {
 			if (selectedPiece != -1) {
 				Vector2f newPosition = (new Vector2f(e.X, e.Y) / Piece.Size).Floor();
-				Piece selected = Pieces[selectedPiece];
-				if (selected.CanMove(Pieces.Except(new[] { selected }).ToList(), newPosition) && CanMoveSelected()) {
-					selected.BoardPosition = newPosition;
+				ClientPiece selected = Board.Pieces[selectedPiece];
+				if (selected.Child.CanMove(Board.AllExcept(selected), newPosition) && Board.CanMoveSelected()) {
+					selected.Child.BoardPosition = newPosition;
 					CurrentTurn = CurrentTurn == Team.White ? Team.Black : Team.White;
 				}
 				selected.UseBoardPosition();
@@ -117,34 +118,13 @@ namespace Chess {
 
 		private void OnMouseButtonPress(object sender, MouseButtonEventArgs e) {
 			Vector2f boardPosition = (new Vector2f(e.X, e.Y) / Piece.Size).Floor();
-			for (int i = 0; i < Pieces.Count; i++) {
-				if (Pieces[i].BoardPosition == boardPosition) {
-					if (Pieces[i].Team == CurrentTurn) {
+			for (int i = 0; i < Board.Pieces.Count; i++) {
+				if (Board.Pieces[i].Child.BoardPosition == boardPosition) {
+					if (Board.Pieces[i].Child.Team == CurrentTurn) {
 						selectedPiece = i;
 						return;
 					}
 				}
-			}
-		}
-
-		/**
-		 * <summary>Removes opposing piece from target position and returns true, or returns false if the piece is friendly.</summary>
-		 * <remarks>Also returns true if there is no piece at the target position.</remarks>
-		 */
-		public bool CanMoveSelected() {
-			Piece selected = Pieces[selectedPiece];
-			Vector2f workingPosition = selected.GetWorkingBoardPosition();
-			Piece other = Pieces.Where(p => {
-				return workingPosition == p.BoardPosition && p != Pieces[selectedPiece];
-			}).SingleOrDefault();
-			if (other == default(Piece)) {
-				return true;
-			}
-			if (other.Team == selected.Team) {
-				return false;
-			} else { // TODO: Handle check(mate)
-				Pieces.Remove(other);
-				return true;
 			}
 		}
 

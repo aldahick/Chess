@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SFML.System;
 
-namespace Chess {
+namespace Chess.Shared {
 	public static class Vector2fExtensions {
 		public static Vector2f Abs(this Vector2f vector) {
 			return new Vector2f(Math.Abs(vector.X), Math.Abs(vector.Y));

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SFML.System;
 
-namespace Chess.Pieces {
+namespace Chess.Shared.Pieces {
 	public class Rook : Piece {
 		public Rook(Vector2f position, Team team) : base(position, team) { }
 

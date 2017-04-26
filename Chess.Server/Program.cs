@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess {
-	public class Program {
-		public static void Main(string[] args) {
-			Game game = new Game();
-			game.Start();
+namespace Chess.Server {
+	class Program {
+		static void Main(string[] args) {
 		}
 	}
 }

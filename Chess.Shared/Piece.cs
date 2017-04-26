@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SFML.Graphics;
 using SFML.System;
-using Chess.Pieces;
+using Chess.Shared.Pieces;
 
-namespace Chess {
+namespace Chess.Shared {
 	public abstract class Piece {
 		public const int Size = 45;
-		public Sprite Sprite { get; }
 		public Team Team { get; }
 		public Vector2f BoardPosition { get; set; }
 		public bool IsCaptured { get; set; }
@@ -25,37 +23,13 @@ namespace Chess {
 
 		public Piece(Vector2f boardPosition, Team team) {
 			Team = team;
-			Sprite = SetupSprite();
 			BoardPosition = boardPosition;
-			UseBoardPosition();
-		}
-
-		public Vector2f Position {
-			get => Sprite.Position;
-			set => Sprite.Position = value;
-		}
-
-		public void UseBoardPosition() {
-			this.Sprite.Position = BoardPosition * Size;
-		}
-
-		public Vector2f GetWorkingBoardPosition() {
-			return (this.Sprite.Position / Size).Round();
-		}
-
-		private Sprite SetupSprite() {
-			Vector2i texturePosition = new Vector2i(TextureIndex * Size, Size * (int)Team);
-			Texture texture = new Texture(Game.PieceSpritesheet, new IntRect(texturePosition, new Vector2i(Size, Size)));
-			return new Sprite(texture);
 		}
 
 		public static List<Piece> CreateStandardBoard() {
 			List<Piece> board = new List<Piece>();
 			board.AddRange(CreateStandardTeam(Team.White));
 			board.AddRange(CreateStandardTeam(Team.Black));
-			foreach (Piece piece in board) {
-				piece.SetupSprite();
-			}
 			return board;
 		}
 
