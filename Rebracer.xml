@@ -424,7 +424,7 @@
         <PropertyValue name="RenameRenameComments">false</PropertyValue>
         <PropertyValue name="RenameRenameInactive">false</PropertyValue>
         <PropertyValue name="RenameRenameStrings">false</PropertyValue>
-        <PropertyValue name="RenameRenameUnconfirmed">true</PropertyValue>
+        <PropertyValue name="RenameRenameUnconfirmed">false</PropertyValue>
         <PropertyValue name="RenameSearchComments">true</PropertyValue>
         <PropertyValue name="RenameSearchStrings">true</PropertyValue>
         <PropertyValue name="RenameShowPreview">true</PropertyValue>

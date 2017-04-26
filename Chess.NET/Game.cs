@@ -7,13 +7,15 @@ using SFML.Window;
 
 namespace Chess {
 	public class Game {
+		public static Font InfoFont { get; } = new Font("Resources/SourceSansPro-Regular.ttf");
+		public static Image PieceSpritesheet { get; } = new Image("Resources/Pieces.png");
 		public RenderWindow Window { get; }
 		public Sprite Background { get; }
-		public static Image PieceSpritesheet { get; } = new Image("Resources/Pieces.png");
 		public List<Piece> Pieces { get; }
+		public Team CurrentTurn { get; set; } = Team.White;
 
 		public Game() {
-			Window = new RenderWindow(new VideoMode(360, 360), "Chess.NET");
+			Window = new RenderWindow(new VideoMode(360, 376), "Chess.NET");
 			Background = CreateBackground();
 			Pieces = Piece.CreateStandardBoard();
 		}
@@ -40,6 +42,9 @@ namespace Chess {
 			if (selectedPiece != -1) {
 				Window.Draw(GetPieceHighlight(), PrimitiveType.Lines);
 			}
+			Window.Draw(new Text($"It is currently {CurrentTurn.ToString()}'s turn.", InfoFont, 16) {
+				Position = new Vector2f(0, 360)
+			});
 			Window.Display();
 		}
 
@@ -102,6 +107,7 @@ namespace Chess {
 				Piece selected = Pieces[selectedPiece];
 				if (selected.CanMove(Pieces.Except(new[] { selected }).ToList(), newPosition) && CanMoveSelected()) {
 					selected.BoardPosition = newPosition;
+					CurrentTurn = CurrentTurn == Team.White ? Team.Black : Team.White;
 				}
 				selected.UseBoardPosition();
 			}
@@ -112,8 +118,10 @@ namespace Chess {
 			Vector2f boardPosition = (new Vector2f(e.X, e.Y) / Piece.Size).Floor();
 			for (int i = 0; i < Pieces.Count; i++) {
 				if (Pieces[i].BoardPosition == boardPosition) {
-					selectedPiece = i;
-					return;
+					if (Pieces[i].Team == CurrentTurn) {
+						selectedPiece = i;
+						return;
+					}
 				}
 			}
 		}
