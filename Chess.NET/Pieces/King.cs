@@ -11,7 +11,8 @@ namespace Chess.Pieces {
 
 		public override bool CanMove(List<Piece> board, Vector2f to) {
 			Vector2f diff = (BoardPosition - to).Abs();
-			return !(diff.X > 1 || diff.Y > 1);
+			int count = board.Count(p => p.BoardPosition == to && p.Team == this.Team && p != this);
+			return count == 0 && !(diff.X > 1 || diff.Y > 1);
 		}
 	}
 }
