@@ -19,8 +19,23 @@ namespace Chess.Pieces {
 			if (Math.Abs(diff.X / diff.Y) != 1) {
 				return false;
 			}
-			Vector2f mod = new Vector2f(from.X > to.X ? -1 : 1, from.Y > to.Y ? -1 : 1);
-			for (Vector2f pos = new Vector2f(from.X, from.Y); pos.X <= to.X && pos.Y <= to.Y; pos += mod) {
+			Vector2f pos = new Vector2f(from.X, from.Y);
+			Func<bool> sentry;
+			Action iteration;
+			if (from.X > to.X && from.Y > to.Y) {
+				sentry = () => pos.X >= to.X && pos.Y >= to.Y;
+				iteration = () => { pos.X--; pos.Y--; };
+			} else if (from.X > to.X && from.Y < to.Y) {
+				sentry = () => pos.X >= to.X && pos.Y <= to.Y;
+				iteration = () => { pos.X--; pos.Y++; };
+			} else if (from.X < to.X && from.Y > to.Y) {
+				sentry = () => pos.X <= to.X && pos.Y >= to.Y;
+				iteration = () => { pos.X++; pos.Y--; };
+			} else {
+				sentry = () => pos.X <= to.X && pos.Y <= to.Y;
+				iteration = () => { pos.X++; pos.Y++; };
+			}
+			for (; sentry(); iteration()) {
 				Piece other = board.Where(p => p.BoardPosition == pos).SingleOrDefault();
 				if (other != default(Piece)) {
 					if (other.BoardPosition == to && other.Team != me.Team) {

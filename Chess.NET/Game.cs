@@ -29,8 +29,13 @@ namespace Chess {
 		private void Render() {
 			Window.Clear(Color.Black);
 			Window.Draw(Background);
-			foreach (Piece piece in Pieces) {
-				Window.Draw(piece.Sprite);
+			for (int i = 0; i < Pieces.Count; i++) {
+				if (i != selectedPiece) {
+					Window.Draw(Pieces[i].Sprite);
+				}
+			}
+			if (selectedPiece != -1) {
+				Window.Draw(Pieces[selectedPiece].Sprite);
 			}
 			if (selectedPiece != -1) {
 				Window.Draw(GetPieceHighlight(), PrimitiveType.Lines);
