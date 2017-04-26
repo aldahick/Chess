@@ -40,7 +40,7 @@ namespace Chess {
 		}
 
 		public Vector2f GetWorkingBoardPosition() {
-			return this.Sprite.Position / Size;
+			return (this.Sprite.Position / Size).Round();
 		}
 
 		private Sprite SetupSprite() {

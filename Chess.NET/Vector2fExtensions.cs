@@ -10,7 +10,11 @@ namespace Chess {
 		}
 
 		public static Vector2f Floor(this Vector2f vector) {
-			return new Vector2f((int)Math.Floor(vector.X), (int)Math.Floor(vector.Y));
+			return new Vector2f((float)Math.Floor(vector.X), (float)Math.Floor(vector.Y));
+		}
+
+		public static Vector2f Round(this Vector2f vector) {
+			return new Vector2f((float)Math.Round(vector.X), (float)Math.Round(vector.Y));
 		}
 	}
 }

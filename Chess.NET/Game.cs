@@ -69,11 +69,14 @@ namespace Chess {
 
 		private Vertex[] GetPieceHighlight() {
 			Vertex[] arr = new Vertex[8];
-			Vector2f selectedPosition = Pieces[selectedPiece].Position;
-			arr[0] = new Vertex(selectedPosition, Color.Red);
-			arr[1] = new Vertex(selectedPosition + new Vector2f(0, Piece.Size), Color.Red);
-			arr[2] = new Vertex(selectedPosition + new Vector2f(Piece.Size, Piece.Size), Color.Red);
-			arr[3] = new Vertex(selectedPosition + new Vector2f(Piece.Size, 0), Color.Red);
+			Piece selected = Pieces[selectedPiece];
+			Vector2f workingPosition = selected.GetWorkingBoardPosition();
+			Vector2f selectedPosition = workingPosition * Piece.Size;
+			Color color = selected.CanMove(Pieces, workingPosition) ? Color.Green : Color.Red;
+			arr[0] = new Vertex(selectedPosition, color);
+			arr[1] = new Vertex(selectedPosition + new Vector2f(0, Piece.Size), color);
+			arr[2] = new Vertex(selectedPosition + new Vector2f(Piece.Size, Piece.Size), color);
+			arr[3] = new Vertex(selectedPosition + new Vector2f(Piece.Size, 0), color);
 			arr[4] = arr[0];
 			arr[5] = arr[3];
 			arr[6] = arr[1];
@@ -116,8 +119,9 @@ namespace Chess {
 		 */
 		public bool CanMoveSelected() {
 			Piece selected = Pieces[selectedPiece];
+			Vector2f workingPosition = selected.GetWorkingBoardPosition();
 			Piece other = Pieces.Where(p => {
-				return selected.GetWorkingBoardPosition() == p.BoardPosition && p != Pieces[selectedPiece];
+				return workingPosition == p.BoardPosition && p != Pieces[selectedPiece];
 			}).SingleOrDefault();
 			if (other == default(Piece)) {
 				return true;
