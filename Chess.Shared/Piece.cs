@@ -26,6 +26,10 @@ namespace Chess.Shared {
 			BoardPosition = boardPosition;
 		}
 
+		public override string ToString() {
+			return Team.ToString() + " " + BoardPosition.ToString();
+		}
+
 		public static List<Piece> CreateStandardBoard() {
 			List<Piece> board = new List<Piece>();
 			board.AddRange(CreateStandardTeam(Team.White));
